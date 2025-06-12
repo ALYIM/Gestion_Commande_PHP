@@ -88,7 +88,7 @@
 <!--RECHERCHE DES PRODUITS PAR SON NUMERO-->
 <?php
 
-$bdd2=new PDO('mysql:host=localhost;dbname=projet2;charset=utf8','root','root');
+$bdd2=new PDO('mysql:host=localhost;dbname=projet2;charset=utf8','root','');
 
 $liste2 =$bdd2->query('select * from produit order by numproduit asc');
 
