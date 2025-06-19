@@ -88,7 +88,7 @@
 <!--RECHERCHE DES COMMANDE PAR le NUMERO du client-->
 <?php
 
-$bdd2=new PDO('mysql:host=localhost;dbname=projet2;charset=utf8','root','');
+$bdd2=new PDO('mysql:host=localhost;dbname=database;charset=utf8','root','');
 
 $liste2 =$bdd2->query('select * from commande order by numclient asc');
 

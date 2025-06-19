@@ -30,7 +30,7 @@
 
 <?php
 
-$connection = mysqli_connect("localhost","root","root");
+$connection = mysqli_connect("localhost","root","");
 $db=mysqli_select_db($connection,'projet2');
 
 if(isset($_POST['update']))

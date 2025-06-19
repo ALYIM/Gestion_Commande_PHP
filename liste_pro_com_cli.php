@@ -1,175 +1,295 @@
 <?php
+include 'connexion.php';
 
-include'connexion.php';
-if (isset($_GET['numclient'])){
-    $numclient=$_GET['numclient'];
-      $record=mysqli_query($con,"SELECT produit.* FROM client,produit,commande WHERE commande.numclient=client.numclient and commande.numproduit=produit.numproduit and client.numclient='$numclient'");
+if (isset($_GET['numclient'])) {
+    $numclient = $_GET['numclient'];
+    $record = mysqli_query($con, "SELECT produit.* FROM client,produit,commande 
+                                WHERE commande.numclient=client.numclient 
+                                AND commande.numproduit=produit.numproduit 
+                                AND client.numclient='$numclient'");
       
-      $minmax=mysqli_query($con,"SELECT min(commande.date) as DateMin , max(commande.date) as DateMax from commande where commande.numclient='$numclient'");
-      if(mysqli_num_rows($minmax) ==1){
-        $n=mysqli_fetch_array($minmax);
-        $datemin=$n['DateMin'];
-        $datemax=$n['DateMax'];
-      }
-      $client=mysqli_query($con,"select *from client where numclient='$numclient'");
-      if(mysqli_num_rows($client)==1){
-        $cli=mysqli_fetch_array($client);
-        $num_cli=$cli['numclient'];
-        $nom_cli=$cli['nom'];
-      }
+    $minmax = mysqli_query($con, "SELECT MIN(commande.date) as DateMin, 
+                                 MAX(commande.date) as DateMax 
+                                 FROM commande 
+                                 WHERE commande.numclient='$numclient'");
+    
+    if(mysqli_num_rows($minmax) == 1) {
+        $n = mysqli_fetch_array($minmax);
+        $datemin = $n['DateMin'];
+        $datemax = $n['DateMax'];
+    }
+    
+    $client = mysqli_query($con, "SELECT * FROM client WHERE numclient='$numclient'");
+    if(mysqli_num_rows($client) == 1) {
+        $cli = mysqli_fetch_array($client);
+        $num_cli = $cli['numclient'];
+        $nom_cli = $cli['nom'];
+    }
 }
-
 ?>
 
-
 <!DOCTYPE html>
-    <html>
-        <head>
-            <title> Liste des produit commandé </title>
-            <meta charset="utf-8">
-            <style>
-            body{
-                   background-color:whitesmoke;
-                }
-                
-            legend{
-                color:white;
-                font-size:20px;
-            }
-            
-            .input1{
-                border:1px black solid;
-                height:20px;
-                width:150px;
-                border-radius:10px;
-                margin:2px;
-            }
-            .input2{
-                border:1px black solid;
-                height:20px;
-                width:150px;
-                border-radius:10px;
-                margin:2px;
-            }
-            
-            .input3{
-                border:1px black solid;
-                height:20px;
-                width:150px;
-                border-radius:10px;
-                margin:2px;
-            }
-            .input4{
-                border:1px black solid;
-                height:20px;
-                width:150px;
-                border-radius:10px;
-                margin:2px;
-            }
-            
-            .i11{
-                margin-left:10px;
-            }
-            .i22{
-                margin-left:70px;
-            }
-            .i33{
-                margin-left:30px;
-            }
-            .i44{
-                margin-left:50px;
-            }
-                
-
-           #divbody{
-                  background-color:black;
-                  border :5px white double;
-                  border-radius: 15px;
-                  color : white;
-                  height : 420pt;
-                  width : 950pt;
-                  position: relative;
-                  top : 35px;
-                  left : 35px;
-               }
-               
-            .bloc1{
-                border : 1px white solid;
-                background-color:rgb(0,100,120);
-                border-radius:10px;
-                width:300px;
-                height:150px;
-                margin-left:450px;
-               }
-            
-            .button{
-                margin-left:40px;
-                margin-top:10px;
-            }
-            
-            .affichage{
-                border:1px white solid;
-                border-radius:15px;
-                height:300px;
-                width:715pt;
-                margin-left:150px;
-                margin-top:10px;
-            }
-            
-            table{
-                border-collapse:collapse;
-                color:white;
-            }
-            
-            th,td{
-                border:1px white solid;
-            }
-            
-            
-            </style>
-        </head>
-        <body>
-            <a href="client.php"> retour </a>
-            <div id="divbody">
-                <center><h1>Liste des produits commandé entre 2 dates</h1></center>
-    
-                    <form class="bloc1" action="liste_pro_com_clie.php"  method='POST'>
-                        <label class="i11" for="num">Numero client :</label>
-                        <input class="input1" type="text" name="num_cli" value="<?=$num_cli ?>" id="num" ></br>
-                        <label class="i22" for="nom">Nom :</label>
-                        <input class="input2" type="text" name="nom_cli" value="<?=$nom_cli ?>" id="nom" ></br>
-                        <label class="i33" for="jour1">Debut date :</label>
-                        <input class="input3" type="date" name="datemin" value="<?=$datemin ?>" id="jour1" ></br>
-                        <label class="i44" for="jour2">Fin date :</label>
-                        <input class="input4" type="date" name="datemax" value="<?=$datemax ?>" id="jour2" ></br>
-                        <input class="button" type="submit" name="submit" value="Listé les produits entre ces 2 dates">
-                    
-                    </form>
+<html lang="fr">
+<head>
+    <title>Liste des produits commandés</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
         
-                 <div class="affichage">
-                    <table>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .header-title {
+            color: var(--secondary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .header-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: var(--primary-color);
+        }
+        
+        .client-info-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .form-control {
+            border-radius: 8px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-back {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-back:hover {
+            color: var(--primary-color);
+            transform: translateX(-3px);
+        }
+        
+        .table-container {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table thead th {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .table tbody tr {
+            transition: all 0.3s;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+            transform: scale(1.01);
+        }
+        
+        .table tbody td {
+            padding: 12px 15px;
+            vertical-align: middle;
+            border-color: #eee;
+        }
+        
+        .no-products {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 20px;
+            }
+            
+            .client-info-card {
+                padding: 15px;
+            }
+            
+            .btn-primary {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-container">
+            <a href="client.php" class="btn-back mb-3 d-inline-flex align-items-center">
+                <i class="fas fa-arrow-left me-2"></i> Retour
+            </a>
+            
+            <h1 class="header-title">Liste des produits commandés</h1>
+            
+            <div class="card client-info-card mb-4">
+                <div class="card-body">
+                    <form action="liste_pro_com_clie.php" method="POST" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="num" class="form-label">Numéro client</label>
+                            <input type="text" class="form-control" name="num_cli" value="<?= htmlspecialchars($num_cli) ?>" id="num" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="nom" class="form-label">Nom</label>
+                            <input type="text" class="form-control" name="nom_cli" value="<?= htmlspecialchars($nom_cli) ?>" id="nom" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="jour1" class="form-label">Date de début</label>
+                            <input type="date" class="form-control" name="datemin" value="<?= htmlspecialchars($datemin) ?>" id="jour1">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="jour2" class="form-label">Date de fin</label>
+                            <input type="date" class="form-control" name="datemax" value="<?= htmlspecialchars($datemax) ?>" id="jour2">
+                        </div>
+                        <div class="col-12 text-center">
+                            <button type="submit" name="submit" class="btn btn-primary">
+                                <i class="fas fa-filter me-2"></i>Filtrer les produits
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <?php if(mysqli_num_rows($record) > 0): ?>
+                    <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>NUMERO</th>
-                                <th>DESIGN</th>
-                                <th>PRIX UNITAIRE</th>
-                                <th>STOCK</th>
+                                <th>#</th>
+                                <th>Désignation</th>
+                                <th>Prix unitaire</th>
+                                <th>Stock</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
-                        <?php while($row =mysqli_fetch_array($record)) { ?>
-                        <tr>
-                            <td> <?php echo $row['numproduit'] ?> </td>
-                            <td> <?php echo $row['design'] ?> </td>
-                            <td> <?php echo $row['pu'] ?> </td>
-                            <td> <?php echo $row['stock'] ?> </td>
-                        </tr>
-                        <?php } ?>
+                        <tbody>
+                            <?php while($row = mysqli_fetch_array($record)): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($row['numproduit']) ?></td>
+                                    <td><?= htmlspecialchars($row['design']) ?></td>
+                                    <td><?= number_format($row['pu'], 2, ',', ' ') ?> €</td>
+                                    <td>
+                                        <span class="badge bg-<?= ($row['stock'] > 0) ? 'success' : 'danger' ?>">
+                                            <?= htmlspecialchars($row['stock']) ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary ms-1">
+                                            <i class="fas fa-print"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endwhile; ?>
+                        </tbody>
                     </table>
-                 </div>
-                
-                
+                <?php else: ?>
+                    <div class="no-products">
+                        <i class="fas fa-box-open fa-3x mb-3"></i>
+                        <h5>Aucun produit commandé trouvé</h5>
+                        <p class="text-muted">Ce client n'a pas encore passé de commande ou aucune commande ne correspond aux critères.</p>
+                    </div>
+                <?php endif; ?>
             </div>
-        </body>
-    </html>
-    
-    
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animation pour le chargement des données
+        document.addEventListener('DOMContentLoaded', function() {
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach((row, index) => {
+                setTimeout(() => {
+                    row.style.opacity = '1';
+                }, index * 100);
+            });
+            
+            // Ajout d'un effet de confirmation lors du filtrage
+            const form = document.querySelector('form');
+            if(form) {
+                form.addEventListener('submit', function() {
+                    const btn = this.querySelector('button[type="submit"]');
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Traitement...';
+                    btn.disabled = true;
+                });
+            }
+        });
+    </script>
+</body>
+</html>

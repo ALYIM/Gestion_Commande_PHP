@@ -87,7 +87,7 @@
 <!--RECHERCHE DES COMMANDE PAS LE numero de produit-->
 
 <?php
-$bdd=new PDO('mysql:host=localhost;dbname=projet2;charset=utf8','root','');
+$bdd=new PDO('mysql:host=localhost;dbname=database;charset=utf8','root','');
 
 $liste =$bdd->query('select * from commande order by numproduit asc');
 
